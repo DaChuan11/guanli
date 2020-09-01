@@ -36,12 +36,22 @@ export default {
   name: "yujing",
   methods: {
     cheak(row) {
-      this.postdataYU = row;
+      this.postdataYU = {
+        name: row.name,
+        address: row.address,
+        url: row.url,
+        urljpg: row.urljpg,
+        level: row.level,
+      };
+      //后退操作
+      sessionStorage.setItem("houtui", JSON.stringify(this.postdataYU));
+      // console.log(this.postdataYU.toString);
     },
   },
   data() {
     return {
       postdataYU: {},
+      //后台获取
       tableData: [
         {
           date: "2016-05-02 11:12:32",

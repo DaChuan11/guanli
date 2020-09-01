@@ -4,10 +4,10 @@
       <!-- 标签 -->
       <el-breadcrumb-item :to="{ path: '/index' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>流程详情</el-breadcrumb-item>
-      <el-breadcrumb-item>{{$route.query.postLC.name}}</el-breadcrumb-item>
+      <el-breadcrumb-item>{{$route.query.postdataLC.name}}</el-breadcrumb-item>
     </el-breadcrumb>
     <div class="pdfshow">
-      <pdfshowLC :posturl="posturl"></pdfshowLC>
+      <pdfshow :posturl="$route.query.postdataLC.url"></pdfshow>
     </div>
     <!-- <button @click="ifch()">000</button> -->
     <div style="float:right;width:950px;height:100%;position: relative;">
@@ -46,11 +46,11 @@
 </template>
 
 <script>
-import pdfshowLC from "./pdfshowLC";
+import pdfshow from './pdfshow'
 export default {
   name: "liucheng",
   components: {
-    pdfshowLC,
+    pdfshow,
   },
   data() {
     return {
@@ -68,22 +68,18 @@ export default {
         },
         step4: { timein: "18月10号 12:28:22" },
       },
-      posturl: this.$route.query.postLC.url,
+      posturl: this.$route.query.postdataLC.url,
     };
   },
   methods: {
     temp() {
-      console.log(this.$route.query);
+      console.log(this.$route.query.postdataLC);
     },
-    changepdf() {
-      let p = document.querySelector(".pdfshow");
-      console.log(p);
-    },
+    
   },
 
   mounted() {
     this.temp();
-    this.changepdf();
   },
 };
 </script>

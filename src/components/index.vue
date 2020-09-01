@@ -15,11 +15,19 @@
           :row-class-name="tableRowClassName"
           max-height="800px"
         >
-          <el-table-column prop="name" label="姓名" width="180"></el-table-column>
-          <el-table-column prop="address" label="床位"></el-table-column>
-          <el-table-column prop="heartRate" label="心率" sortable width="180"></el-table-column>
+          <el-table-column prop="num" label="编号" width="120"></el-table-column>
+          <el-table-column prop="name" label="姓名" width="120"></el-table-column>
+          <el-table-column prop="address" label="床位" width="180"></el-table-column>
+          <el-table-column prop="heartRate" label="心率" sortable ></el-table-column>
           <el-table-column prop="condition" label="危机情况" sortable width="180"></el-table-column>
-          <el-table-column prop="reason" label="预警原因" width="180"></el-table-column>
+          <el-table-column prop="information" label="预警原因" width="220">
+            <template slot-scope="scope">
+              <div v-if="scope.row.information[0]>10">{{"房性早搏："+ scope.row.information[0] + "/24h"}}</div>
+              <div v-if="scope.row.information[1]>20">{{"矩阵房速："+scope.row.information[1]+ "/24h"}}</div>
+              <div v-if="scope.row.information[2]>20">{{"对成房早："+ scope.row.information[2]+ "/24h"}}</div>
+              <div v-if="scope.row.information[3]>10">{{"多源性室性早搏："+ scope.row.information[3]+ "/24h"}}</div>
+            </template>
+          </el-table-column>
           <el-table-column prop="scheme" label="处理方案" width="180"></el-table-column>
           <el-table-column align="center" width="200">
             <template slot="header" slot-scope="scope" @click="te(scope)">
@@ -43,7 +51,7 @@
               <div slot="header" class="clearfix">
                 <span>预警</span>
               </div>
-              <div class="text item">{{yujingnub}}</div>
+              <div class="text item">{{todays[0]}}</div>
             </el-card>
           </router-link>
           <router-link to="/danger">
@@ -51,23 +59,23 @@
               <div slot="header" class="clearfix">
                 <span>危险</span>
               </div>
-              <div class="text item">{{weixiannub}}</div>
+              <div class="text item">{{todays[1]}}</div>
             </el-card>
           </router-link>
           <router-link to="/chuli">
             <el-card class="box-card" shadow="hover">
               <div slot="header" class="clearfix">
-                <span>处理</span>
+                <span>处理完成</span>
               </div>
-              <div class="text item">{{chulinub}}</div>
+              <div class="text item">{{todays[2]}}</div>
             </el-card>
           </router-link>
-          <router-link to="/logoin">
+          <router-link to="/weichuli">
             <el-card class="box-card" shadow="hover">
               <div slot="header" class="clearfix">
                 <span>未处理</span>
               </div>
-              <div class="text item">{{weichulinub}}</div>
+              <div class="text item">{{todays[3]}}</div>
             </el-card>
           </router-link>
         </div>
@@ -90,331 +98,16 @@ export default {
   data() {
     return {
       search: "",
-      yujingnub: 0,
-      weixiannub: 0,
-      chulinub: 0,
-      weichulinub: 0,
+      todays:[2,3,4,5],
       tableData: [
         {
-          date: "2016-05-02",
+          num: 1,
           name: "周晓婉",
           address: "3区208房1号床",
           condition: "危险",
           heartRate: 63,
-          reason: "房性早搏：65/24h",
+          information: [65, 12, 12, 42],
           scheme: "已转交给医生",
-        },
-        {
-          date: "2016-05-04",
-          name: "孙儒",
-          address: "3区208房1号床",
-          heartRate: 53,
-          reason: "矩阵房速：12/24h",
-          scheme: "已转交给护工",
-          condition: "警告",
-        },
-        {
-          date: "2016-05-01",
-          name: "李辉",
-          address: "3区208房1号床",
-          heartRate: 83,
-          reason: "对成房早：65/24h",
-          scheme: "已转交给医生",
-          condition: "提醒",
-        },
-        {
-          date: "2016-05-03",
-          name: "吴赐",
-          address: "3区208房1号床",
-          condition: "危险",
-        },
-        {
-          date: "2016-05-02",
-          name: "周峯",
-          address: "3区208房1号床",
-          condition: "危险",
-        },
-        {
-          date: "2016-05-04",
-          name: "孙儒",
-          address: "3区208房1号床",
-          condition: "警告",
-        },
-        {
-          date: "2016-05-01",
-          name: "李辉",
-          address: "3区208房1号床",
-          condition: "提醒",
-        },
-        {
-          date: "2016-05-03",
-          name: "吴赐",
-          address: "3区208房1号床",
-          condition: "危险",
-        },
-        {
-          date: "2016-05-02",
-          name: "周峯",
-          address: "3区208房1号床",
-          condition: "危险",
-        },
-        {
-          date: "2016-05-04",
-          name: "孙儒",
-          address: "3区208房1号床",
-          condition: "警告",
-        },
-        {
-          date: "2016-05-01",
-          name: "李辉",
-          address: "3区208房1号床",
-          condition: "提醒",
-        },
-        {
-          date: "2016-05-03",
-          name: "吴赐",
-          address: "3区208房1号床",
-          condition: "危险",
-        },
-        {
-          date: "2016-05-02",
-          name: "周峯",
-          address: "3区208房1号床",
-          condition: "危险",
-        },
-        {
-          date: "2016-05-04",
-          name: "孙儒",
-          address: "3区208房1号床",
-          condition: "警告",
-        },
-        {
-          date: "2016-05-01",
-          name: "李辉",
-          address: "3区208房1号床",
-          condition: "提醒",
-        },
-        {
-          date: "2016-05-03",
-          name: "吴赐",
-          address: "3区208房1号床",
-          condition: "危险",
-        },
-        {
-          date: "2016-05-02",
-          name: "周峯",
-          address: "3区208房1号床",
-          condition: "危险",
-        },
-        {
-          date: "2016-05-04",
-          name: "孙儒",
-          address: "3区208房1号床",
-          condition: "警告",
-        },
-        {
-          date: "2016-05-01",
-          name: "李辉",
-          address: "3区208房1号床",
-          condition: "提醒",
-        },
-        {
-          date: "2016-05-03",
-          name: "吴赐",
-          address: "3区208房1号床",
-          condition: "危险",
-        },
-        {
-          date: "2016-05-02",
-          name: "周峯",
-          address: "3区208房1号床",
-          condition: "危险",
-        },
-        {
-          date: "2016-05-04",
-          name: "孙儒",
-          address: "3区208房1号床",
-          condition: "警告",
-        },
-        {
-          date: "2016-05-01",
-          name: "李辉",
-          address: "3区208房1号床",
-          condition: "提醒",
-        },
-        {
-          date: "2016-05-03",
-          name: "吴赐",
-          address: "3区208房1号床",
-          condition: "危险",
-        },
-        {
-          date: "2016-05-02",
-          name: "周峯",
-          address: "3区208房1号床",
-          condition: "危险",
-        },
-        {
-          date: "2016-05-04",
-          name: "孙儒",
-          address: "3区208房1号床",
-          condition: "警告",
-        },
-        {
-          date: "2016-05-01",
-          name: "李辉",
-          address: "3区208房1号床",
-          condition: "提醒",
-        },
-        {
-          date: "2016-05-03",
-          name: "吴赐",
-          address: "3区208房1号床",
-          condition: "危险",
-        },
-        {
-          date: "2016-05-02",
-          name: "周峯",
-          address: "3区208房1号床",
-          condition: "危险",
-        },
-        {
-          date: "2016-05-04",
-          name: "孙儒",
-          address: "3区208房1号床",
-          condition: "警告",
-        },
-        {
-          date: "2016-05-01",
-          name: "李辉",
-          address: "3区208房1号床",
-          condition: "提醒",
-        },
-        {
-          date: "2016-05-03",
-          name: "吴赐",
-          address: "3区208房1号床",
-          condition: "危险",
-        },
-        {
-          date: "2016-05-02",
-          name: "周峯",
-          address: "3区208房1号床",
-          condition: "危险",
-        },
-        {
-          date: "2016-05-04",
-          name: "孙儒",
-          address: "3区208房1号床",
-          condition: "警告",
-        },
-        {
-          date: "2016-05-01",
-          name: "李辉",
-          address: "3区208房1号床",
-          condition: "提醒",
-        },
-        {
-          date: "2016-05-03",
-          name: "吴赐",
-          address: "3区208房1号床",
-          condition: "危险",
-        },
-        {
-          date: "2016-05-02",
-          name: "周峯",
-          address: "3区208房1号床",
-          condition: "危险",
-        },
-        {
-          date: "2016-05-04",
-          name: "孙儒",
-          address: "3区208房1号床",
-          condition: "警告",
-        },
-        {
-          date: "2016-05-01",
-          name: "李辉",
-          address: "3区208房1号床",
-          condition: "提醒",
-        },
-        {
-          date: "2016-05-03",
-          name: "吴赐",
-          address: "3区208房1号床",
-          condition: "危险",
-        },
-        {
-          date: "2016-05-02",
-          name: "周峯",
-          address: "3区208房1号床",
-          condition: "危险",
-        },
-        {
-          date: "2016-05-04",
-          name: "孙儒",
-          address: "3区208房1号床",
-          condition: "警告",
-        },
-        {
-          date: "2016-05-01",
-          name: "李辉",
-          address: "3区208房1号床",
-          condition: "提醒",
-        },
-        {
-          date: "2016-05-03",
-          name: "吴赐",
-          address: "3区208房1号床",
-          condition: "危险",
-        },
-        {
-          date: "2016-05-02",
-          name: "周峯",
-          address: "3区208房1号床",
-          condition: "危险",
-        },
-        {
-          date: "2016-05-04",
-          name: "孙儒",
-          address: "3区208房1号床",
-          condition: "警告",
-        },
-        {
-          date: "2016-05-01",
-          name: "李辉",
-          address: "3区208房1号床",
-          condition: "提醒",
-        },
-        {
-          date: "2016-05-03",
-          name: "吴赐",
-          address: "3区208房1号床",
-          condition: "危险",
-        },
-        {
-          date: "2016-05-02",
-          name: "周峯",
-          address: "3区208房1号床",
-          condition: "危险",
-        },
-        {
-          date: "2016-05-04",
-          name: "孙儒",
-          address: "3区208房1号床",
-          condition: "警告",
-        },
-        {
-          date: "2016-05-01",
-          name: "李辉",
-          address: "3区208房1号床",
-          condition: "提醒",
-        },
-        {
-          date: "2016-05-03",
-          name: "吴赐",
-          address: "3区208房1号床",
-          condition: "危险",
         },
       ],
       postdataYU: "",

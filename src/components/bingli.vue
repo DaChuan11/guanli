@@ -4,10 +4,10 @@
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <!-- 标签 -->
       <el-breadcrumb-item :to="{ path: '/index' }">首页</el-breadcrumb-item>
-      <el-breadcrumb-item>预警详情</el-breadcrumb-item>
-      <el-breadcrumb-item>{{$route.query.postdataYU.name}}</el-breadcrumb-item>
+      <el-breadcrumb-item>病例详情</el-breadcrumb-item>
+      <el-breadcrumb-item>{{postdataYU.name}}</el-breadcrumb-item>
     </el-breadcrumb>
-    <pdfshow :posturl="posturl" v-if="!showwhat"></pdfshow>
+    <pdfshow :posturl="postdataYU.url" v-if="!showwhat"></pdfshow>
     <div class="jpgshow" v-if="showwhat"></div>
     <el-switch
       style="display: block"
@@ -22,11 +22,11 @@
     <div style="float:right;width:950px;height:100%;position: relative;">
       <div>
         <div class="msgBL">
-          <p>预警等级：{{ this.peoplemsg.levalYJ }}</p>
+          <p>预警等级：{{postdataYU.level}}</p>
           <p>性别：{{ this.peoplemsg.gender }}</p>
           <p>家人电话：{{ this.peoplemsg.contact }}</p>
           <p>预警次数：{{ this.peoplemsg.time }}</p>
-          <p>床位：{{ this.peoplemsg.berth }}</p>
+          <p>床位：{{ postdataYU.address }}</p>
           <p>病史：{{ this.peoplemsg.medicalHistory }}</p>
           <div class="photoBL"></div>
         </div>
@@ -58,7 +58,7 @@
           </template>
         </el-step>
       </el-steps>
-      <router-link :to="{path:'/liucheng',query:{postLC}}">
+      <router-link :to="{path:'/liucheng',query:{postdataLC}}">
         <el-button type="primary" round style="marginTop:50px">流程详情</el-button>
       </router-link>
       <div style="textAlign: left;fontSize:22px;position: absolute;bottom: 360px;">历史病例</div>
@@ -74,7 +74,9 @@
         <el-table-column prop="fix" label="病因分析"></el-table-column>
         <el-table-column label="操作">
           <div slot-scope="scope">
-            <el-button size="mini" @click="cheak(scope.$index, scope.row)">查看详情</el-button>
+            <router-link :to="{path:'/bingli',query:{postdataYU}}">
+              <el-button size="mini" @click="cheak(scope.$index, scope.row)">查看详情</el-button>
+            </router-link>
           </div>
         </el-table-column>
       </el-table>
@@ -109,7 +111,11 @@ export default {
       //route传来的pdf地址信息
       posturl: this.$route.query.postdataYU.url,
       //route传来的信息
-      postLC: this.$route.query.postdataYU,
+      postdataLC: {
+        url: this.$route.query.postdataYU.url,
+        name: this.$route.query.postdataYU.name,
+      },
+      postdataYU: this.$route.query.postdataYU,
       //病例信息  后端获取
       tableData: [
         {
@@ -161,24 +167,33 @@ export default {
   methods: {
     //判断是否有人工病例
     cheakjpg() {
-      //  console.log(this.$route.query.postdataYU.urljpg);
-      if (this.$route.query.postdataYU.urljpg) {
+      if (this.postdataYU.urljpg) {
         this.havejpg = false;
       }
     },
     cheak(index, row) {
       this.posturl = row.url;
-      console.log(this.posturl);
-      console.log(this.GLOBAL);
+      this.postdataYU.url = row.url;
+      //系统病例
+      // console.log(this.posturl);
+      // console.log(this.GLOBAL);
     },
-    //test
+    //session取值
     test() {
-      console.log(this.$route.query.postdataYU);
+      if (!this.postdataYU.name) {
+        this.postdataYU = JSON.parse(sessionStorage.getItem("houtui"));
+        this.postdataLC = {
+          url: this.postdataYU.url,
+          name: this.postdataYU.name,
+          urljpg: this.postdataYU.urljpg,
+        };
+        console.log(this.postdataLC);
+      }
     },
   },
   mounted() {
-    this.cheakjpg();
     this.test();
+    this.cheakjpg();
   },
 };
 </script>

@@ -3,7 +3,7 @@
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <!-- 标签 -->
       <el-breadcrumb-item :to="{ path: '/index' }">首页</el-breadcrumb-item>
-      <el-breadcrumb-item>处理详情</el-breadcrumb-item>
+      <el-breadcrumb-item>处理完成详情</el-breadcrumb-item>
     </el-breadcrumb>
     <div>
       <el-table
@@ -23,7 +23,7 @@
             <el-input v-model="search" size="mini" placeholder="输入姓名搜索" />
           </template>
           <template slot-scope="scope">
-            <router-link :to="{path:'/liucheng',query:{postLC}}">
+            <router-link :to="{path:'/liucheng',query:{postdataLC}}">
               <el-button size="mini" @click="cheak(scope.row)">查看详情</el-button>
             </router-link>
           </template>
@@ -38,22 +38,23 @@ export default {
   name: "chuli",
   methods: {
     cheak(row) {
-      this.postLC = row;
+      this.postdataLC = row;
     },
   },
   data() {
     return {
       search: "",
-      postLC: {},
+      postdataLC: {},
       tableData: [
         {
           date: "2016-05-02 11:12:32",
-          name: "王小虎1",
+          name: "张1",
           address: "B区280号",
           condition: 73,
           fix: "房性早搏",
-          level: "危险",
+          level: "1级预警",
           url: "static/xiaohu1.pdf",
+          urljpg: "../assets/test.jpg",
         },
         {
           date: "2016-05-04  11:12:32",

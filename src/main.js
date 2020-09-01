@@ -12,6 +12,7 @@ import Yujing from './components/yujing.vue'
 import Bingli from './components/bingli.vue'
 import Danger from './components/danger.vue'
 import Chuli from './components/chuli.vue'
+import Weichuli from './components/weichuli.vue'
 import Liucheng from './components/liucheng.vue'
 import Dangan from './components/dangan.vue'
 import Gerendangan from './components/gerendangan.vue'
@@ -49,6 +50,10 @@ const routes = [{
     path: "/chuli",
     component: Chuli,
     name: 'chuli'
+  }, {
+    path: "/weichuli",
+    component: Weichuli,
+    name: 'weichuli'
   }, {
     path: "/liucheng",
     component: Liucheng,
