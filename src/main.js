@@ -17,6 +17,7 @@ import Liucheng from './components/liucheng.vue'
 import Dangan from './components/dangan.vue'
 import Gerendangan from './components/gerendangan.vue'
 import Indexxiangqing from './components/indexxiangqing.vue'
+import Login from './components/login.vue'
 
 import global_ from './components/logo' //引用文件
 Vue.prototype.GLOBAL = global_ //挂载到Vue实例上面
@@ -29,6 +30,10 @@ const routes = [{
     path: "/index",
     component: Index,
     name: 'index'
+  }, {
+    path: "/login",
+    component: Login,
+    name: 'login'
   },
   {
     path: "/logoin",

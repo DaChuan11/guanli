@@ -4,37 +4,133 @@
       <!-- 标签 -->
       <el-breadcrumb-item :to="{ path: '/index' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>接待管理</el-breadcrumb-item>
-      <el-breadcrumb-item>老人登记</el-breadcrumb-item>
+      <el-breadcrumb-item>登记</el-breadcrumb-item>
     </el-breadcrumb>
     <div class="tableLO">
-      <el-form ref="form" :model="form" label-width="80px">
-        <el-form-item label="老人姓名">
-          <el-input v-model="form.name" style="width:200px"></el-input>
-        </el-form-item>
-        <el-form-item label="老人姓名">
-          <el-input v-model="form.name" style="width:200px"></el-input>
-        </el-form-item>
-        <el-form-item label="老人性别">
-          <el-select v-model="form.region" placeholder="请选择性别">
-            <el-option label="男" value="man"></el-option>
-            <el-option label="女" value="woman"></el-option>
-          </el-select>
-        </el-form-item>
-        <div>
+      <el-form ref="form" :model="form" label-width="120px">
+        <div style="width:1000px;float:left">
+          <p style="fontSize:20px;marginBottom:20px">用户基本信息登记</p>
+          <el-button icon="el-icon-search" circle style="position: absolute;left: 330px;"></el-button>
+          <el-form-item label="手机号码">
+            <el-input v-model="form.phone" style="width:200px"></el-input>
+          </el-form-item>
+          <el-form-item label="密码">
+            <el-input
+              v-model="form.account_password"
+              style="width:200px"
+              placeholder="非必填(默认身份证后六位)"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="姓名">
+            <el-input v-model="form.name" style="width:200px"></el-input>
+          </el-form-item>
+          <el-button
+            icon="el-icon-search"
+            circle
+            style="position: absolute;left: 330px;top: 147px;"
+          ></el-button>
+
+          <el-form-item label="身份证号">
+            <el-input v-model="form.id_number" style="width:200px"></el-input>
+          </el-form-item>
+          <el-form-item label="生日">
+            <el-date-picker
+              type="date"
+              placeholder="选择日期"
+              v-model="form.birthday"
+              style="width: 100%;"
+            ></el-date-picker>
+          </el-form-item>
+
+          <el-form-item label="床位号">
+            <el-input v-model="form.bed" style="width:200px"></el-input>
+          </el-form-item>
+          <el-form-item label="家庭住址">
+            <el-input v-model="form.home_location" style="width:200px"></el-input>
+          </el-form-item>
+          <el-form-item label="性别">
+            <el-select v-model="form.sex" placeholder="请选择性别">
+              <el-option label="男" value="男"></el-option>
+              <el-option label="女" value="女"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="自理能力">
+            <el-select v-model="form.self_care_ability" placeholder="请选择自理能力">
+              <el-option label="能够自理" value="能够自理"></el-option>
+              <el-option label="不能自理" value="不能自理"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="护理级别">
+            <el-select v-model="form.level_of_care" placeholder="请选择护理级别">
+              <el-option label="贴身护理" value="贴身护理"></el-option>
+              <el-option label="需要护理" value="需要护理"></el-option>
+              <el-option label="不需要护理" value="不需要护理"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="责任医生">
+            <el-input v-model="form.responsible_doctor" style="width:200px"></el-input>
+          </el-form-item>
+        </div>
+        <div style="width:800px;float:left" class="poLO">
+          <p style="font-size: 20px; margin-bottom: 20px;width: 100%;text-align: center;">家人紧急信息</p>
+          <el-form-item label="紧急联系人一" style="width: 800px;">
+            <div class="poLO2">
+              <p>姓名：</p>
+              <el-input v-model="form.emergency_contact_1_name" style="width:200px"></el-input>
+            </div>
+            <div class="poLO2">
+              <p>关系：</p>
+              <el-select v-model="form.emergency_contact_1_relationship" placeholder="与用户关系">
+                <el-option label="儿女" value="儿女"></el-option>
+                <el-option label="夫妻" value="夫妻"></el-option>
+              </el-select>
+            </div>
+            <div class="poLO2">
+              <p>联系电话：</p>
+              <el-input v-model="form.emergency_contact_1_phone" style="width:200px"></el-input>
+            </div>
+            <div class="poLO2">
+              <p>住址：</p>
+              <el-input v-model="form.emergency_contact_1_location" style="width:200px"></el-input>
+            </div>
+          </el-form-item>
+          <el-form-item label="紧急联系人二" style="width: 800px;">
+            <div class="poLO2">
+              <p>姓名：</p>
+              <el-input
+                v-model="form.emergency_contact_2_name"
+                style="width:200px"
+                placeholder="非必填"
+              ></el-input>
+            </div>
+            <div class="poLO2">
+              <p>关系：</p>
+              <el-select v-model="form.emergency_contact_2_relationship" placeholder="与用户关系">
+                <el-option label="儿女" value="儿女"></el-option>
+                <el-option label="夫妻" value="夫妻"></el-option>
+              </el-select>
+            </div>
+            <div class="poLO2">
+              <p>联系电话：</p>
+              <el-input
+                v-model="form.emergency_contact_2_phone"
+                style="width:200px"
+                placeholder="非必填"
+              ></el-input>
+            </div>
+            <div class="poLO2">
+              <p>住址：</p>
+              <el-input
+                v-model="form.emergency_contact_2_location"
+                style="width:200px"
+                placeholder="非必填"
+              ></el-input>
+            </div>
+          </el-form-item>
+        </div>
+
+        <!-- <div>
           上传头像
-          <!-- <el-upload
-            name="file"
-            v-if="optype==0"
-            :action="'/upload'"
-            accept=".jpg, .png"
-            list-type="picture-card"
-            :file-list="fileLists"
-            :on-preview="handlePictureCardPreview"
-            :on-success="success"
-            :on-remove="handleRemove"
-          >
-            <i class="el-icon-plus"></i>
-          </el-upload>-->
           <input
             class="file"
             name="file"
@@ -42,44 +138,98 @@
             accept="image/png, image/gif, image/jpeg"
             @change="update($event)"
           />
+        </div>-->
+        <div style="width:1000px;float:left">
+          <div style="fontSize:20px;marginBottom:20px;width: 100%;float: left;">健康信息</div>
+
+          <el-form-item label="入院时间" style="width: 365px;">
+            <el-col :span="11">
+              <el-date-picker
+                type="date"
+                placeholder="选择日期"
+                v-model="form.time_start"
+                style="width: 100%;"
+              ></el-date-picker>
+            </el-col>
+            <el-col class="line" :span="2">-</el-col>
+            <el-col :span="11">
+              <el-time-picker placeholder="选择时间" v-model="form.time_second" style="width: 100%;"></el-time-picker>
+            </el-col>
+          </el-form-item>
+          <el-form-item label="血压情况">
+            <el-select v-model="form.blood_pressure" placeholder="请选择">
+              <el-option label="高血压" value="高血压"></el-option>
+              <el-option label="低血压" value="低血压"></el-option>
+              <el-option label="无血压疾病" value="无血压疾病"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="血糖情况">
+            <el-select v-model="form.blood_glucose" placeholder="请选择">
+              <el-option label="高血糖" value="高血糖"></el-option>
+              <el-option label="低血糖" value="低血糖"></el-option>
+              <el-option label="无血糖疾病" value="无血糖疾病"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="血型">
+            <el-select v-model="form.blood_type" placeholder="血型选择">
+              <el-option label="A" value="A"></el-option>
+              <el-option label="B" value="B"></el-option>
+              <el-option label="O" value="O"></el-option>
+              <el-option label="AB" value="AB"></el-option>
+              <el-option label="未知" value="unknow"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="体重(kg)">
+            <el-input v-model="form.weight" style="width:200px"></el-input>
+          </el-form-item>
+
+          <el-form-item label="身高(cm)">
+            <el-input v-model="form.height" style="width:200px"></el-input>
+          </el-form-item>
+          <el-form-item label="心脏情况">
+            <el-button @click="dialogVisible1 = true">点击展开</el-button>
+            <el-dialog
+              title="心脏情况(多选框)"
+              :visible.sync="dialogVisible1"
+              width="30%"
+              :before-close="handleClose"
+            >
+              <el-checkbox-group v-model="form.heart_condition">
+                <el-checkbox label="窦性心动过缓" name="type"></el-checkbox>
+                <el-checkbox label="窦性心动过速" name="type"></el-checkbox>
+                <el-checkbox label="窦性心律不齐" name="type"></el-checkbox>
+                <el-checkbox label="窦性停搏" name="type"></el-checkbox>
+                <el-checkbox label="房室传导阻滞" name="type"></el-checkbox>
+                <el-checkbox label="室上性早搏" name="type"></el-checkbox>
+                <el-checkbox label="室性早搏" name="type"></el-checkbox>
+                <el-checkbox label="阵发性室上性心动过速" name="type"></el-checkbox>
+                <el-checkbox label="阵发性室性心动过速" name="type"></el-checkbox>
+                <el-checkbox label="心房扑动" name="type"></el-checkbox>
+                <el-checkbox label="心房纤颤" name="type"></el-checkbox>
+                <el-checkbox label="心室扑动" name="type"></el-checkbox>
+                <el-checkbox label="心房颤动伴预激综合征" name="type"></el-checkbox>
+                <el-checkbox label="未知" name="type"></el-checkbox>
+                <el-checkbox label="健康" name="type"></el-checkbox>
+              </el-checkbox-group>
+              <span slot="footer" class="dialog-footer">
+                <el-button @click="dialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click="dialogVisible1 = false">确 定</el-button>
+              </span>
+            </el-dialog>
+          </el-form-item>
+          <el-form-item label="家族病史">
+            <el-input v-model="form.family_history" style="width:200px" placeholder="非必填"></el-input>
+          </el-form-item>
+          <el-form-item label="过敏药物">
+            <el-input v-model="form.drug_use" style="width:200px" placeholder="非必填"></el-input>
+          </el-form-item>
         </div>
-
-        <el-form-item label="入院时间">
-          <el-col :span="11">
-            <el-date-picker
-              type="date"
-              placeholder="选择日期"
-              v-model="form.date1"
-              style="width: 100%;"
-            ></el-date-picker>
-          </el-col>
-          <el-col class="line" :span="2">-</el-col>
-          <el-col :span="11">
-            <el-time-picker placeholder="选择时间" v-model="form.date2" style="width: 100%;"></el-time-picker>
-          </el-col>
-        </el-form-item>
-
-        <el-form-item label="病史">
-          <el-checkbox-group v-model="form.type">
-            <el-checkbox label="心脏病" name="type"></el-checkbox>
-            <el-checkbox label="高血压" name="type"></el-checkbox>
-            <el-checkbox label="高血糖" name="type"></el-checkbox>
-            <el-checkbox label="单纯品牌曝光" name="type"></el-checkbox>
-          </el-checkbox-group>
-        </el-form-item>
-        <el-form-item label="特殊资源">
-          <el-radio-group v-model="form.resource">
-            <el-radio label="线上品牌商赞助"></el-radio>
-            <el-radio label="线下场地免费"></el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="活动形式">
-          <el-input type="textarea" v-model="form.desc"></el-input>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="onSubmit">立即创建</el-button>
-          <el-button>清空</el-button>
-        </el-form-item>
+        <div style="width:1000px;left: 1200px;bottom: 45px;position: relative;">
+          <el-form-item style="width:600px;marginLeft:-100px">
+            <el-button type="primary" @click="onSubmit()">立即创建</el-button>
+            <el-button>清空</el-button>
+          </el-form-item>
+        </div>
       </el-form>
     </div>
   </div>
@@ -95,23 +245,72 @@ export default {
       fileLists: [],
       //test1
       form: {
+        id: 0,
+        account_password: "",
         name: "",
-        region: "",
-        date1: "",
-        date2: "",
-        delivery: false,
-        type: [],
-        resource: "",
-        desc: "",
+        id_number: "",
+        birthday: "",
+        phone: "",
+        bed: "",
+        blood_type: "",
+        home_location: "",
+        emergency_contact_1_name: "",
+        emergency_contact_1_relationship: "",
+        emergency_contact_1_phone: "",
+        emergency_contact_1_location: "",
+        emergency_contact_2_name: "",
+        emergency_contact_2_relationship: "",
+        emergency_contact_2_phone: "",
+        emergency_contact_2_location: "",
+        sex: "",
+        self_care_ability: "",
+        level_of_care: "",
+        responsible_doctor: "",
+        time_start: "",
+        time_second: "",
+        blood_pressure: "",
+        blood_glucose: "",
+        weight: "",
+        height: "",
+        heart_condition: [],
+        family_history: "",
+        drug_use: "",
       },
       imageUrl: "",
+      dialogVisible1: false,
     };
   },
   methods: {
     onSubmit() {
-      console.log("submit!");
+      let send = JSON.parse(JSON.stringify(this.form));
+      send.time_start = send.time_start.slice(0, 10);
+      send.time_second = send.time_second.slice(11, 19);
+      send.birthday = send.birthday.slice(0, 10);
+      let l = "";
+      for (let i = 0; i < this.form.heart_condition.length; i++) {
+        l += this.form.heart_condition[i] + " ";
+      }
+      send.heart_condition = l;
+      send.beadhouse_id = this.GLOBAL.yanglaoyuanid;
+      // send.
+      console.log(send);
+      //  console.log(send.time_start.toLocaleDateString());
+      this.$axios({
+        url: this.GLOBAL.serverSrc + "beadhousepeople/register",
+        method: "post",
+        data: send,
+      }).then((res) => {
+        console.log(res);
+      });
+      // console.log(this.form);
     },
-
+    handleClose(done) {
+      this.$confirm("确认关闭？")
+        .then(() => {
+          done();
+        })
+        .catch(() => {});
+    },
     update(e) {
       let file = e.target.files[0];
       let param = new FormData(); //创建form对象
@@ -132,14 +331,37 @@ export default {
 </script>
 
 <style>
-.el-form > :nth-child(1) {
-  width: 300px;
+.el-checkbox {
+  text-align: left;
+  width: 148px;
 }
-.el-form > :nth-child(2) {
-  width: 300px;
+.poLO2 {
+  display: inline-block;
+  width: 290px;
+  margin-bottom: 20px;
 }
-.el-form > :nth-child(3) {
-  float: left;
+.poLO p {
+  width: 80px;
+  text-align: right;
+  display: inline-block;
+}
+.el-form > :nth-child(7) {
+  width: 1000px;
+}
+.el-form > :nth-child(7) > div > div {
+  margin-right: 10px;
+}
+.el-form > :nth-child(8) {
+  width: 1000px;
+}
+.el-form > :nth-child(8) > div > div {
+  margin-right: 10px;
+}
+.el-form > :nth-child(13) {
+  width: 600px;
+}
+.el-form > :nth-child(19) {
+  width: 1000px;
 }
 .avatar-uploader .el-upload {
   border: 1px dashed #d9d9d9;
@@ -168,15 +390,15 @@ export default {
   width: 120px !important;
 }
 .el-form {
-  width: 900px;
+  /* width: 1000px; */
   height: 100%;
 }
 .el-form-item {
-  width: 500px;
+  width: 300px;
   float: left;
 }
 .tableLO {
-  width: 900px;
+  /* width: 1000px; */
   height: 100%;
 }
 </style>

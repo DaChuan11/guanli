@@ -5,34 +5,42 @@
       <el-breadcrumb-item :to="{ path: '/index' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>健康档案</el-breadcrumb-item>
     </el-breadcrumb>
-    <div>
+    <div style="marginTop:20px">
       <el-table
         :data="tableData.filter(data => !search || data.name.toLowerCase().includes(search.toLowerCase()))"
         style="width: 100%"
+        height="590"
         :default-sort="{prop: 'date', order: 'descending'}"
       >
-        <el-table-column prop="DAnub" label="编号" width="180"></el-table-column>
         <el-table-column prop="name" label="姓名" width="180"></el-table-column>
-        <el-table-column prop="address" label="床位"></el-table-column>
-        <el-table-column prop="DAtime" label="危险次数" sortable></el-table-column>
+        <el-table-column prop="bed" label="床位"></el-table-column>
+        <el-table-column prop="danger_times" label="危险次数" sortable></el-table-column>
         <el-table-column
           prop="DAlevel"
           label="健康评级"
-          :filters="[{ text: '十分安全', value: '十分安全' }, { text: '较为安全', value: '较为安全' }, { text: '较危险', value: '较危险' }]"
+          :filters="[{ text: '健康', value: '健康' }, { text: '较健康', value: '较健康' }, { text: '较危险', value: '较危险' }]"
           :filter-method="filterTag"
         ></el-table-column>
-        <el-table-column prop="DAshang" label="上次危险时间"></el-table-column>
+        <el-table-column prop="last_time" label="上次危险时间"></el-table-column>
         <el-table-column align="center" width="200">
           <template slot="header" slot-scope="scope" @click="te(scope)">
             <el-input v-model="search" size="mini" placeholder="输入姓名搜索" />
           </template>
           <template slot-scope="scope">
-            <router-link :to="{path:'/gerendangan',query:{postdata}}">
+            <router-link :to="{path:'/gerendangan'}">
               <el-button size="mini" @click="cheak(scope.row)">查看详情</el-button>
             </router-link>
+            <el-button size="mini" type="danger" style="marginLeft:10px" @click="del(scope)">出院</el-button>
           </template>
         </el-table-column>
       </el-table>
+      <el-pagination
+        :page-size="10"
+        layout="prev, pager, next"
+        :total="total"
+        @current-change="handleCurrentChange"
+        style="marginTop:120px"
+      ></el-pagination>
     </div>
   </div>
 </template>
@@ -41,102 +49,87 @@
 export default {
   name: "dangan",
   methods: {
+    handleCurrentChange(val) {
+      this.page = val;
+      this.getmsg(val);
+    },
+    del(scope) {
+      this.$axios({
+        url:
+          this.GLOBAL.serverSrc +
+          "beadhousepeople/delete/" +
+          this.GLOBAL.yanglaoyuanid +
+          "/" +
+          scope.row.id,
+        data: {},
+        method: "get",
+      }).then(() => {
+        this.getmsg(this.page);
+      });
+    },
     cheak(row) {
-      this.postdata = row;
+      console.log('档案传值',this.GLOBAL.BL.sendid,this.GLOBAL.BL.name);
+      this.GLOBAL.BL.sendid = row.id;
+      this.GLOBAL.BL.name = row.name;
+      // this.postdata = row;
     },
     //查询框
     filterTag(value, row) {
       return row.DAlevel === value;
     },
+    //查询从入院到最后一次发病的时间
+    gettimep(time1, timeSB) {
+      //上一次生病时间  生病次数
+      let time = new Date().toLocaleDateString();
+      let year = time.slice(0, 4);
+      let time1year = time1.slice(0, 4);
+      //年
+      let mon = time.slice(5, 6);
+      let time1mon = time1.slice(5, 6);
+      let temp =
+        timeSB / (parseInt((year - time1year) * 12) + parseInt(mon - time1mon));
+      if (temp == Infinity) return "时间过短,无法判断";
+      else if (temp < 1 / 6) return "健康";
+      else if (temp < 1 / 3 && temp >= 1 / 6) return "较健康";
+      else if (temp < 1 && temp >= 1 / 3) return "较危险";
+      else if (temp > 1) return "危险";
+    },
+    getmsg(temp) {
+      this.$axios({
+        url:
+          this.GLOBAL.serverSrc +
+          "beadhousepeople/selectarchives/" +
+          this.GLOBAL.yanglaoyuanid +
+          "/" +
+          temp,
+        data: {},
+        method: "get",
+      }).then((res) => {
+        console.log(res);
+        this.total = res.data.data.count;
+        this.tableData = JSON.parse(JSON.stringify(res.data.data.info.list));
+        for (let i = 0; i < this.tableData.length; i++) {
+          this.tableData[i].DAlevel = this.gettimep(
+            this.tableData[i].time_start,
+            this.tableData[i].danger_times
+          );
+        }
+      });
+    },
   },
   data() {
     return {
+      //当前页码
+      page: 1,
+      //共多少数据
+      total: 0,
       search: "",
       postdata: {},
-      tableData: [
-        {
-          DAnub: 221144,
-          name: "张1",
-          address: "B区280号",
-          DAtime: 0,
-          DAlevel: "十分安全",
-          url: "static/xiaohu1.pdf",
-          DAshang: "无",
-        },
-        {
-          DAnub: 221146,
-          name: "王2",
-          address: "B区308号",
-          DAtime: 3,
-          DAlevel: "较为安全",
-          DAshang: "2020年1月1日",
-          url: "static/xiaohu2.pdf",
-        },
-        {
-          DAnub: 221144,
-          name: "傅3",
-          address: "C区280号",
-          DAtime: 5,
-          DAlevel: "较危险",
-          DAshang: "2020年3月1日",
-          url: "static/xiaohu3.pdf",
-        },
-        {
-          DAnub: 221144,
-          name: "张1",
-          address: "B区280号",
-          DAtime: 0,
-          DAlevel: "十分安全",
-          url: "static/xiaohu1.pdf",
-          DAshang: "无",
-        },
-        {
-          DAnub: 221146,
-          name: "王2",
-          address: "B区308号",
-          DAtime: 3,
-          DAlevel: "较为安全",
-          DAshang: "2020年1月1日",
-          url: "static/xiaohu2.pdf",
-        },
-        {
-          DAnub: 221144,
-          name: "傅3",
-          address: "C区280号",
-          DAtime: 5,
-          DAlevel: "较危险",
-          DAshang: "2020年3月1日",
-          url: "static/xiaohu3.pdf",
-        },
-        {
-          DAnub: 221144,
-          name: "张1",
-          address: "B区280号",
-          DAtime: 0,
-          DAlevel: "十分安全",
-          url: "static/xiaohu1.pdf",
-          DAshang: "无",
-        },
-        {
-          DAnub: 221146,
-          name: "王2",
-          address: "B区308号",
-          DAtime: 3,
-          DAlevel: "较为安全",
-          DAshang: "2020年1月1日",
-          url: "static/xiaohu2.pdf",
-        },
-        {
-          DAnub: 221144,
-          name: "傅3",
-          address: "C区280号",
-          DAtime: 5,
-          DAlevel: "较危险",
-          DAshang: "2020年3月1日",
-          url: "static/xiaohu3.pdf",
-        },
-      ],
+      tableData: [],
     };
+  },
+  mounted() {
+    this.getmsg(this.page);
   },
 };
 </script>

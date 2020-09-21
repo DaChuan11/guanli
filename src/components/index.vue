@@ -13,22 +13,28 @@
           style="width: 100%"
           :default-sort="{prop: 'date', order: 'descending'}"
           :row-class-name="tableRowClassName"
-          max-height="800px"
+          max-height="700px"
         >
-          <el-table-column prop="num" label="编号" width="120"></el-table-column>
           <el-table-column prop="name" label="姓名" width="120"></el-table-column>
-          <el-table-column prop="address" label="床位" width="180"></el-table-column>
-          <el-table-column prop="heartRate" label="心率" sortable ></el-table-column>
-          <el-table-column prop="condition" label="危机情况" sortable width="180"></el-table-column>
-          <el-table-column prop="information" label="预警原因" width="220">
-            <template slot-scope="scope">
-              <div v-if="scope.row.information[0]>10">{{"房性早搏："+ scope.row.information[0] + "/24h"}}</div>
-              <div v-if="scope.row.information[1]>20">{{"矩阵房速："+scope.row.information[1]+ "/24h"}}</div>
-              <div v-if="scope.row.information[2]>20">{{"对成房早："+ scope.row.information[2]+ "/24h"}}</div>
-              <div v-if="scope.row.information[3]>10">{{"多源性室性早搏："+ scope.row.information[3]+ "/24h"}}</div>
-            </template>
+          <el-table-column prop="bed" label="床位" width="180"></el-table-column>
+          <el-table-column
+            prop="heart_condition_now"
+            label="心率"
+            sortable
+            :sort-method="sortChange1"
+          ></el-table-column>
+          <el-table-column prop="crisis_situation" label="危机情况" sortable width="180"></el-table-column>
+          <el-table-column prop="reason_for_early_warning" label="预警原因" width="220">
+            <!-- <template slot-scope="scope">
+              <div v-if="scope.row.information[0]>10">{{"房性早搏："+ scope.row.num_2 + "/24h"}}</div>
+              <div v-if="scope.row.information[1]>20">{{"矩阵房速："+scope.row.num_3+ "/24h"}}</div>
+              <div v-if="scope.row.information[2]>20">{{"对成房早："+ scope.row.num_4+ "/24h"}}</div>
+              <div
+                v-if="scope.row.information[3]>10"
+              >{{"多源性室性早搏："+ scope.row.information[3]+ "/24h"}}</div>
+            </template>-->
           </el-table-column>
-          <el-table-column prop="scheme" label="处理方案" width="180"></el-table-column>
+          <el-table-column prop="treatment_plan" label="处理方案" width="180"></el-table-column>
           <el-table-column align="center" width="200">
             <template slot="header" slot-scope="scope" @click="te(scope)">
               <el-input v-model="search" size="mini" placeholder="输入姓名搜索" />
@@ -40,6 +46,13 @@
             </template>
           </el-table-column>
         </el-table>
+        <el-pagination
+          :page-size="10"
+          layout="prev, pager, next"
+          :total="total"
+          @current-change="handleCurrentChange"
+          style="width: 100%;height: 40px;"
+        ></el-pagination>
       </div>
 
       <!-- 今日详情 -->
@@ -82,11 +95,11 @@
       </div>
       <!-- 简介 -->
       <div class="jieshao">
-        <div>成都XXX养老院</div>
-        <div>负责人：孙翼谋</div>
-        <div>负责人电话：1111222333</div>
-        <div>已处理次数：200次</div>
-        <div>地址：成都市磨子桥东段</div>
+        <div>{{GLOBAL.ylyXX.name}}</div>
+        <div>负责人：{{GLOBAL.ylyXX.charge_people}}</div>
+        <div>负责人电话：{{GLOBAL.ylyXX.charge_phone}}</div>
+        <div>已处理次数：{{GLOBAL.ylyXX.processing_times}} 次</div>
+        <div>地址：{{GLOBAL.ylyXX.beadhouse_location}}</div>
       </div>
     </div>
   </div>
@@ -97,29 +110,31 @@ export default {
   name: "index",
   data() {
     return {
+      //当前页码
+      page: 1,
+      //共多少数据
+      total: 0,
       search: "",
-      todays:[2,3,4,5],
-      tableData: [
-        {
-          num: 1,
-          name: "周晓婉",
-          address: "3区208房1号床",
-          condition: "危险",
-          heartRate: 63,
-          information: [65, 12, 12, 42],
-          scheme: "已转交给医生",
-        },
-      ],
+      todays: [],
+      tableData: [],
       postdataYU: "",
     };
   },
   methods: {
+    sortChange1(a, b) {
+      console.log(a.heart_condition_now, b.heart_condition_now);
+      return a.heart_condition_now - b.heart_condition_now;
+    },
+    handleCurrentChange(val) {
+      this.page = val;
+      this.getmsg(val);
+    },
     tableRowClassName(row) {
-      if (row.row.condition == "危险") {
+      if (row.row.crisis_situation == "危险") {
         return "jinP";
-      } else if (row.row.condition == "提醒") {
+      } else if (row.row.crisis_situation == "正常") {
         return "tiP";
-      } else if (row.row.condition == "警告") {
+      } else if (row.row.crisis_situation == "预警") {
         return "weiP";
       }
     },
@@ -127,28 +142,42 @@ export default {
       this.postdataYU = b;
       console.log(a, b);
     },
-    gettimeINDEX() {
-      // let that = this;
-      // setInterval(() => {
-      //   that
-      //     .$axios({
-      //       url: this.GLOBAL.serverSrc + "/alldanger",
-      //       method: "post",
-      //       params: {},
-      //     })
-      //     .then((res) => {
-      //       console.log(res.data);
-      //       // that.weixiannub = res.data.nab;
-      //       that.yujingnub=res.data.yujing;
-      //       that.weixiannub=res.data.weixian;
-      //       that.chulinub=res.data.chuli;
-      //       that.weichulinub=res.data.weichuli;
-      //     });
-      // }, 1000);
+    //更新数据 需要轮训
+    getmsg(temp) {
+      this.$axios({
+        url:
+          this.GLOBAL.serverSrc +
+          "pagehome/getpagehome/" +
+          this.GLOBAL.yanglaoyuanid +
+          "/" +
+          temp,
+        data: {},
+        method: "get",
+      }).then((res) => {
+        console.log(res);
+        this.total = res.data.data.count;
+        this.tableData = res.data.data.info.list;
+        let todays = [0, 0, 0, 0];
+        for (let i = 0; i < this.tableData.length; i++) {
+          switch (this.tableData[i].crisis_situation) {
+            case "危险":
+              todays[1]++;
+              break;
+            case "预警":
+              todays[0]++;
+              break;
+            default:
+              break;
+          }
+        }
+        console.log(this.todays);
+        this.$set(this.todays, 0, todays[0]);
+        this.$set(this.todays, 1, todays[1]);
+      });
     },
   },
   mounted() {
-    this.gettimeINDEX();
+    this.getmsg(this.page);
   },
 };
 </script>
@@ -165,10 +194,10 @@ export default {
   font-size: 26px;
 }
 .weiP {
-  background-color: oldlace !important;
+  background-color: rgb(236, 211, 164) !important;
 }
 .tiP {
-  background-color: #f0f9eb !important;
+  background-color: #eff7eb !important;
 }
 .jinP {
   background-color: #f56c6ca9 !important;
