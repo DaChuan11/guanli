@@ -7,31 +7,8 @@
       <el-breadcrumb-item>病例详情</el-breadcrumb-item>
       <el-breadcrumb-item>{{GLOBAL.BL.name}}</el-breadcrumb-item>
     </el-breadcrumb>
-    <pdfshow :posturl="postdataYU.url" v-show="!showwhat"></pdfshow>
-    <!-- <div class="jpgshow" v-if="showwhat"></div> -->
-    <div class="show" v-show="showwhat">
-      <div class="headBG">
-        <div></div>
-        <div>{{GLOBAL.BL.name}}</div>
-        <div>{{GLOBAL.ylyXX.name}}</div>
-      </div>
-      <!-- 折线 -->
-      <p style="fontSize: 24px;fontWeight: 600;">心率周期</p>
-      <p style="float: right;margin-top: -20px;">(231/43)</p>
+    <pdfshow :havejpg="progressBar.havejpg"></pdfshow>
 
-      <canvas id="mycanvas" height="300" width="500">你的浏览器不支持canvas，请升级浏览器</canvas>
-    </div>
-
-    <el-switch
-      style="display: block"
-      v-model="showwhat"
-      active-color="#13ce66"
-      inactive-color="#ff4949"
-      active-text="电子报告"
-      inactive-text="医生报告"
-      class="showbutt"
-      :disabled="!progressBar.havejpg"
-    ></el-switch>
     <div style="float:right;width:950px;height:100%;position: relative;">
       <div>
         <div class="msgBL">
@@ -66,15 +43,11 @@
           </template>
         </el-step>
       </el-steps>
-      <router-link :to="{path:'/liucheng',query:{postdataLC}}">
-        <el-button type="primary" round style="marginTop:50px" @click="setsession()">流程详情</el-button>
+      <router-link :to="{path:'/liucheng' ,query:this.postdata}">
+        <el-button type="primary" round style="marginTop:50px" @click=" setpostdata()">流程详情</el-button>
       </router-link>
       <div style="textAlign: left;fontSize:22px;position: absolute;bottom: 360px;">历史病例</div>
-      <el-table
-        :data="tableData"
-        style="width: 100%;height:350px;position: absolute;bottom: 0;"
-        max-height="500px"
-      >
+      <el-table :data="tableData" style="width: 100%;height:350px;position: absolute;" height="500">
         <el-table-column label="时间">
           <template slot-scope="scope">{{scope.row.sending_time.substring(0,10)}}</template>
         </el-table-column>
@@ -83,10 +56,17 @@
         <el-table-column prop="send_details" label="病因分析"></el-table-column>
         <el-table-column label="操作">
           <div slot-scope="scope">
-            <el-button size="mini" @click="setprogressBar(scope.row)">查看详情</el-button>
+            <el-button size="mini" @click="setprogressBar(true,scope)">查看详情</el-button>
           </div>
         </el-table-column>
       </el-table>
+      <el-pagination
+        :page-size="10"
+        layout="prev, pager, next"
+        :total="total"
+        @current-change="handleCurrentChange"
+        style="position: absolute;width: 100%;bottom: 50px;"
+      ></el-pagination>
     </div>
   </div>
 </template>
@@ -100,234 +80,105 @@ export default {
   },
   data() {
     return {
-      zhexianARR: [
-        5,
-        5,
-        5,
-        12,
-        24,
-        12,
-        5,
-        -5,
-        -5,
-        -10,
-        -20,
-        -30,
-        -20,
-        -10,
-        120,
-        23,
-        154,
-        12,
-        250,
-        75,
-        0,
-        12,
-        32,
-        65,
-        87,
-        98,
-        146,
-      ],
-      zhexianARR1: [200, 100, 50],
+      //传给流程的数据
+      postdata: {},
+      //当前页码
+      page: 1,
+      //共多少数据
+      total: 0,
 
       //后端获取的进度条信息
       progressBar: {
         //是否有人工病例
-        havejpg: "",
+        havejpg: false,
         //进度条步骤state
         state: 0,
-        step1: { timein: "18月10号 12:22:22" },
+        step1: { timein: "" },
         step2: {
-          idGL: "Ｇ＆Ｄ",
+          idGL: "",
         },
         step3: {
-          idGL: "章大腿",
+          idGL: "",
         },
-        step4: { timein: "18月10号 12:28:22" },
+        step4: { timein: "" },
       },
-      //route传来的pdf地址信息
-      posturl: this.$route.query.postdataYU.url,
-      //route传来的信息
-      postdataLC: {
-        url: this.$route.query.postdataYU.url,
-        name: this.$route.query.postdataYU.name,
-      },
-      postdataYU: this.$route.query.postdataYU,
+
       //病例信息  后端获取
       tableData: [],
       //后端获取的这一次的病例信息
       peoplemsg: {},
-      //显示pdf病例还是图片病例  true图片病例
-      showwhat: true,
     };
   },
   methods: {
-    //存session 返回有数据
-    setsession() {},
-    setprogressBar(temp) {
-      console.log(temp);
-      if (temp.state == 0) this.progressBar.state = 4;
-      else this.progressBar.state = temp.state;
+    setpostdata() {
+      console.log("病例页面进入postdata" + this.postdata);
+    },
+    handleCurrentChange(val) {
+      this.page = val;
+      this.gethistory(val);
+    },
+    setprogressBar(p, temp) {
+      // console.log(temp);
+      //点击触发
+      if (p) {
+        console.log(temp);
+        this.postdata = this.peoplemsg.list[temp.$index];
+        temp = temp.row;
+      }
+      //初始化触发
+      console.log(this.progressBar, temp);
+      this.progressBar.state = temp.state == 0 ? 4 : temp.state;
       this.progressBar.step1.timein = temp.sending_time;
-      if (temp.situation == "危险") this.progressBar.step2.idGL = "Ｇ＆Ｄ";
-      else this.progressBar.step2.idGL = "Ｇ";
+      this.progressBar.step2.idGL = temp.situation == "危险" ? "Ｇ＆Ｄ" : "Ｇ";
       this.progressBar.step3.idGL = temp.handler_id;
       this.progressBar.step4.timein = temp.completion_time;
       if (temp.ecg_report_id != null) {
         this.progressBar.havejpg = true;
         console.log(111, this.progressBar.havejpg);
       } else this.progressBar.havejpg = false;
+
+      //修改给下一页的数据
+      this.postdata = temp;
+      this.postdata.name = this.GLOBAL.BL.name;
+      console.log(this.postdata);
       this.$forceUpdate();
     },
-    //折线画心电图
-    drewcam() {
-      let mcanvas = document.querySelector("#mycanvas");
-      let mcontext = mcanvas.getContext("2d");
-      mcontext.lineWidth = 0.5; //设置画笔的粗细
-      mcontext.beginPath(); //开始路径
-      for (let i = 0; i < 7; i++) {
-        mcontext.strokeStyle = "#ccc5c5"; //设置画笔的颜色
-        mcontext.moveTo(0, i * 50); //左顶点
-        mcontext.lineTo(500, i * 50);
-        // mcontext.closePath(); //结束路径
-
-        mcontext.stroke(); //描边路径
-      }
-      mcontext.beginPath(); //开始路径
-      mcontext.lineWidth = 1.5; //设置画笔的粗细
-
-      //中间值
-      let Y = 250;
-      mcontext.moveTo(0, Y); //左顶点
-      let temp = 500 / this.zhexianARR.length;
-
-      for (let i = 0; i < this.zhexianARR.length; i++) {
-        mcontext.lineTo((1 + i) * temp, Y - this.zhexianARR[i]);
-      }
-
-      let linear = mcontext.createLinearGradient(350, 350, 350, 0);
-      linear.addColorStop(0, "#2fdec6");
-      linear.addColorStop(0.5, "#687de2");
-      linear.addColorStop(1, "#8696e4");
-      mcontext.strokeStyle = linear; //把渐变赋给填充样式
-      // mcontext.closePath(); //结束路径
-      mcontext.stroke(); //描边路径
-    },
-    //实心折线
-    drewcam2() {
-      let mcanvas = document.querySelector("#mycanvas");
-      let mcontext = mcanvas.getContext("2d");
-      mcontext.lineWidth = 0.5; //设置画笔的粗细
-      mcontext.beginPath(); //开始路径
-      for (let i = 0; i < 7; i++) {
-        mcontext.strokeStyle = "#ccc5c5"; //设置画笔的颜色
-        mcontext.moveTo(0, i * 50); //左顶点
-        mcontext.lineTo(500, i * 50);
-        mcontext.stroke(); //描边路径
-      }
-      mcontext.beginPath(); //开始路径
-      mcontext.lineWidth = 1.5; //设置画笔的粗细
-
-      //中间值
-      let Y = 250;
-      mcontext.moveTo(0, Y); //左顶点
-      let temp = 500 / this.zhexianARR.length;
-
-      for (let i = 0; i < this.zhexianARR.length; i++) {
-        //平滑
-        // if (i > 1 && i < this.zhexianARR.length - 1) {
-        //   let y1 = Math.floor((i + 2) * temp);
-        //   let x1 = Y - this.zhexianARR[i + 1]; //ok,
-        //   let y2 = Math.floor(Y - this.zhexianARR[i] + temp / 2);
-        //   let x2 = (this.zhexianARR[i + 1] - this.zhexianARR[i]) / 2;
-        //   console.log(x1, y1, (i + 2) * temp, y2);
-        //   mcontext.quadraticCurveTo(x1, y1,  x2, y2);
-        // }
-
-        if (i == this.zhexianARR.length - 1) {
-          mcontext.lineTo((i + 1) * temp, Y);
-        } else mcontext.lineTo((i + 1) * temp, Y - this.zhexianARR[i]);
-      }
-
-      let linear = mcontext.createLinearGradient(350, 350, 350, 0);
-      linear.addColorStop(0, "#2fdec6");
-      linear.addColorStop(0.5, "#687de2");
-      linear.addColorStop(1, "#8696e4");
-      mcontext.fillStyle = linear; //把渐变赋给填充样式
-      mcontext.closePath(); //结束路径
-      mcontext.fill(); //描边路径
-    },
-    drewcam3() {
-      let mcanvas = document.querySelector("#mycanvas");
-      let mcontext = mcanvas.getContext("2d");
-      let temp = 500 / this.zhexianARR.length;
-      mcontext.lineWidth = 0.5; //设置画笔的粗细
-      mcontext.beginPath(); //开始路径
-      for (let i = 0; i < 7; i++) {
-        mcontext.strokeStyle = "#ccc5c5"; //设置画笔的颜色
-        mcontext.moveTo(0, i * 50); //左顶点
-        mcontext.lineTo(500, i * 50);
-        mcontext.stroke(); //描边路径
-      }
-      mcontext.beginPath(); //开始路径
-      mcontext.lineWidth = 1.5; //设置画笔的粗细
-      let linear = mcontext.createLinearGradient(350, 350, 350, 0);
-      linear.addColorStop(0, "#2fdec6");
-      linear.addColorStop(0.5, "#687de2");
-      linear.addColorStop(1, "#8696e4");
-      mcontext.fillStyle = linear; //把渐变赋给填充样式
-      for (let i = 0; i < this.zhexianARR.length; i++) {
-        mcontext.fillRect(
-          Math.floor(i * temp),
-          250,
-          10,
-          -Math.floor(this.zhexianARR[i])
-        );
-        // console.log(-Math.floor(this.zhexianARR[i]));
-        mcontext.stroke();
-      }
-    },
-    gethistory() {
+    //获取历史病例
+    gethistory(val) {
+      this.GLOBAL.dengdai("block");
+      console.log(this.GLOBAL.BL.sendid);
       this.$axios({
         url:
           this.GLOBAL.serverSrc +
           "details/specific/" +
           this.GLOBAL.BL.sendid +
           "/" +
-          this.GLOBAL.yanglaoyuanid,
+          this.GLOBAL.yanglaoyuanid +
+          "/" +
+          val,
         method: "get",
       }).then((res) => {
-        this.peoplemsg = JSON.parse(JSON.stringify(res.data.data));
+        this.peoplemsg = JSON.parse(JSON.stringify(res.data.data.info));
         let time = new Date().getFullYear();
         this.peoplemsg.bir =
-          time - parseInt(res.data.data.birthday.substring(0, 4));
-        this.tableData = res.data.data.list;
+          time - parseInt(res.data.data.info.birthday.substring(0, 4));
+        this.tableData = res.data.data.info.list;
+        this.total = res.data.data.count;
+        console.log("返回", res);
         //写步骤 completion_time
-        this.setprogressBar(res.data.data.list[0]);
+        console.log(res.data.data);
+        if (res.data.data.info.list[this.GLOBAL.BL.nub] == undefined)
+          this.GLOBAL.BL.nub = 0;
+        this.setprogressBar(false, res.data.data.info.list[this.GLOBAL.BL.nub]);
+        //默认去往流程页面的是当前的index
+        this.postdata = this.peoplemsg.list[this.GLOBAL.BL.nub];
+        this.GLOBAL.dengdai("none");
         this.$forceUpdate();
-
-        console.log(res, this.peoplemsg);
       });
-    },
-
-    //session取值
-    test() {
-      if (!this.postdataYU.name) {
-        this.postdataYU = JSON.parse(sessionStorage.getItem("houtui"));
-        this.postdataLC = {
-          url: this.postdataYU.url,
-          name: this.postdataYU.name,
-          urljpg: this.postdataYU.urljpg,
-        };
-        // console.log(this.postdataLC);
-      }
     },
   },
   mounted() {
-    this.test();
-    this.drewcam3();
-    this.gethistory();
+    this.handleCurrentChange(this.page);
   },
 };
 </script>

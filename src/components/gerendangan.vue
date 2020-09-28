@@ -212,8 +212,8 @@
           value-format="yyyy-MM-dd"
         ></el-date-picker>
       </div>
-      <el-table ref="filterTable" :data="tableData" style="width: 100%">
-        <el-table-column prop="sending_time" label="日期" sortable width="200px"></el-table-column>
+      <el-table ref="filterTable" :data="tableData" style="width: 100%" height="650">
+        <el-table-column prop="sending_time" label="日期" width="200px"></el-table-column>
         <el-table-column prop="heart_rate" label="当时心率" width="200px"></el-table-column>
         <el-table-column prop="send_details" label="病因分析" width="300px"></el-table-column>
         <el-table-column
@@ -229,13 +229,20 @@
           </template>
         </el-table-column>
         <el-table-column label="操作">
-          <template slot-scope>
+          <template slot-scope="scope">
             <router-link :to="{path:'/bingli',query:{postdataYU}}">
-              <el-button size="mini">查看详情</el-button>
+              <el-button size="mini" @click="changenub(scope)">查看详情</el-button>
             </router-link>
           </template>
         </el-table-column>
       </el-table>
+      <el-pagination
+        :page-size="10"
+        layout="prev, pager, next"
+        :total="total"
+        @current-change="handleCurrentChange"
+        style="marginTop:120px"
+      ></el-pagination>
       <!-- <el-table ref="filterTable" :data="tablethis" style="width: 100%">
         <el-table-column prop="date" label="日期" sortable width="200px"></el-table-column>
         <el-table-column prop="docname" label="处理人姓名" width="130px"></el-table-column>
@@ -273,6 +280,10 @@ export default {
   components: {},
   data() {
     return {
+      //当前页码
+      page: 1,
+      //共多少数据
+      total: 0,
       dialogVisible1: false,
       //formthis是传过来的对象  form是克隆对象
       formthis: {},
@@ -281,6 +292,7 @@ export default {
       postdataYU: {
         name: this.GLOBAL.BL.name,
         sendid: this.GLOBAL.BL.id,
+        nub: this.GLOBAL.BL.nub,
       },
       value: "",
       disable: true,
@@ -304,26 +316,37 @@ export default {
     };
   },
   methods: {
+    changenub(temp) {
+      this.GLOBAL.BL.nub = temp.$index;
+    },
+    //分页
+    handleCurrentChange(val) {
+      this.page = val;
+      this.changetablethis(val);
+    },
     //查询历史病例
-    changetablethis() {
+    changetablethis(val) {
       this.$axios({
         url:
           this.GLOBAL.serverSrc +
           "details/rhc/" +
           this.GLOBAL.BL.sendid +
           "/" +
-          this.GLOBAL.yanglaoyuanid,
+          this.GLOBAL.yanglaoyuanid +
+          "/" +
+          val,
         method: "get",
       }).then((res) => {
-        this.tableData = res.data.data;
+        console.log(res);
+
+        this.tableData = res.data.data.info.list;
+        this.total = res.data.data.count;
         for (let i = 0; i < this.tableData.length; i++) {
           this.tableData[i].sending_time = this.tableData[
             i
           ].sending_time.substring(0, 10);
         }
         this.$forceUpdate();
-
-        console.log(res);
       });
     },
     changethis(temp) {
@@ -332,6 +355,7 @@ export default {
       this.dialogVisible1 = false;
     },
     getmsg() {
+      this.GLOBAL.dengdai("block");
       this.$axios({
         url:
           this.GLOBAL.serverSrc +
@@ -348,6 +372,7 @@ export default {
           .split(" ");
         this.form = JSON.parse(JSON.stringify(this.formthis));
         console.log(res.data.data);
+        this.GLOBAL.dengdai("none");
         this.$forceUpdate();
       });
     },
@@ -533,7 +558,7 @@ export default {
   },
   mounted() {
     this.getmsg(this.sendid);
-    this.changetablethis();
+    this.handleCurrentChange(this.page);
   },
   watch: {},
 };

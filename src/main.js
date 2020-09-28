@@ -18,7 +18,9 @@ import Dangan from './components/dangan.vue'
 import Gerendangan from './components/gerendangan.vue'
 import Indexxiangqing from './components/indexxiangqing.vue'
 import Login from './components/login.vue'
-
+//读取本地json
+import VueResource from 'vue-resource'
+Vue.use(VueResource)
 import global_ from './components/logo' //引用文件
 Vue.prototype.GLOBAL = global_ //挂载到Vue实例上面
 Vue.use(VueRouter)

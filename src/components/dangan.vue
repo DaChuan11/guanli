@@ -7,7 +7,7 @@
     </el-breadcrumb>
     <div style="marginTop:20px">
       <el-table
-        :data="tableData.filter(data => !search || data.name.toLowerCase().includes(search.toLowerCase()))"
+        :data="tableData"
         style="width: 100%"
         height="590"
         :default-sort="{prop: 'date', order: 'descending'}"
@@ -24,7 +24,19 @@
         <el-table-column prop="last_time" label="上次危险时间"></el-table-column>
         <el-table-column align="center" width="200">
           <template slot="header" slot-scope="scope" @click="te(scope)">
-            <el-input v-model="search" size="mini" placeholder="输入姓名搜索" />
+            <el-input
+              v-model="search"
+              size="mini"
+              placeholder="输入姓名搜索"
+              style="float: right;z-index: 1;"
+            />
+            <el-button
+              type="success"
+              round
+              size="mini"
+              style="z-index: 2;position: absolute;right: 0;"
+              @click="check(1)"
+            >查询</el-button>
           </template>
           <template slot-scope="scope">
             <router-link :to="{path:'/gerendangan'}">
@@ -41,6 +53,51 @@
         @current-change="handleCurrentChange"
         style="marginTop:120px"
       ></el-pagination>
+      <el-dialog fullscreen title="查询结果" :visible.sync="dialogTableVisible ">
+        <el-table :data="gridData">
+          <el-table-column prop="name" label="姓名" width="180"></el-table-column>
+          <el-table-column prop="bed" label="床位"></el-table-column>
+          <el-table-column prop="danger_times" label="危险次数" sortable></el-table-column>
+          <el-table-column
+            prop="DAlevel"
+            label="健康评级"
+            :filters="[{ text: '健康', value: '健康' }, { text: '较健康', value: '较健康' }, { text: '较危险', value: '较危险' }]"
+            :filter-method="filterTag"
+          ></el-table-column>
+          <el-table-column prop="last_dangerous_time" label="上次危险时间"></el-table-column>
+          <el-table-column align="center" width="200">
+            <template slot="header" slot-scope="scope" @click="te(scope)">
+              <el-input
+                v-model="search"
+                size="mini"
+                placeholder="输入姓名搜索"
+                style="float: right;z-index: 1;"
+              />
+              <el-button
+                type="success"
+                round
+                size="mini"
+                style="z-index: 2;position: absolute;right: 0;"
+                @click="check(1)"
+              >查询</el-button>
+            </template>
+            <template slot-scope="scope">
+              <router-link :to="{path:'/gerendangan'}">
+                <el-button size="mini" @click="cheak(scope.row)">查看详情</el-button>
+              </router-link>
+              <el-button size="mini" type="danger" style="marginLeft:10px" @click="del(scope)">出院</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+
+        <el-pagination
+          :page-size="10"
+          layout="prev, pager, next"
+          :total="nametotal"
+          @current-change="nameChange"
+          style="width: 100%;height: 40px;"
+        ></el-pagination>
+      </el-dialog>
     </div>
   </div>
 </template>
@@ -49,11 +106,16 @@
 export default {
   name: "dangan",
   methods: {
+    nameChange(val) {
+      this.namepage = val;
+      this.check(val);
+    },
     handleCurrentChange(val) {
       this.page = val;
       this.getmsg(val);
     },
     del(scope) {
+      this.GLOBAL.dengdai("block");
       this.$axios({
         url:
           this.GLOBAL.serverSrc +
@@ -65,10 +127,11 @@ export default {
         method: "get",
       }).then(() => {
         this.getmsg(this.page);
+        this.GLOBAL.dengdai("none");
       });
     },
     cheak(row) {
-      console.log('档案传值',this.GLOBAL.BL.sendid,this.GLOBAL.BL.name);
+      console.log("档案传值", this.GLOBAL.BL.sendid, this.GLOBAL.BL.name);
       this.GLOBAL.BL.sendid = row.id;
       this.GLOBAL.BL.name = row.name;
       // this.postdata = row;
@@ -95,6 +158,7 @@ export default {
       else if (temp > 1) return "危险";
     },
     getmsg(temp) {
+      this.GLOBAL.dengdai("block");
       this.$axios({
         url:
           this.GLOBAL.serverSrc +
@@ -114,7 +178,34 @@ export default {
             this.tableData[i].danger_times
           );
         }
+        this.GLOBAL.dengdai("none");
       });
+    },
+    //名字模糊查询
+    check(pg) {
+      this.$axios({
+        url:
+          this.GLOBAL.serverSrc +
+          "beadhousepeople/getHealthbyname/" +
+          this.GLOBAL.yanglaoyuanid +
+          "/" +
+          this.search +
+          "/" +
+          pg,
+      }).then((res) => {
+        this.gridData = JSON.parse(JSON.stringify(res.data.data.info.list));
+        for (let i = 0; i < this.gridData.length; i++) {
+          this.gridData[i].DAlevel = this.gettimep(
+            this.gridData[i].time_start,
+            this.gridData[i].danger_times
+          );
+        }
+        this.dialogTableVisible = true;
+        this.nametotal = res.data.data.count;
+        console.log(res);
+      });
+
+      console.log(this.search);
     },
   },
   data() {
@@ -126,6 +217,12 @@ export default {
       search: "",
       postdata: {},
       tableData: [],
+      //查询名字后的数据存放
+      gridData: [],
+      //模糊查询的分页
+      namepage: 1,
+      nametotal: 0,
+      dialogTableVisible: false,
     };
   },
   mounted() {

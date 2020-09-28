@@ -1,7 +1,7 @@
 <template >
   <div id="app">
     <div style="height:100%;width:100%;" v-if="havelogin">
-      <div id="titleA">
+      <div id="titleA" class="flowchange">
         <div id="toplogo"></div>
         <el-row class="toprow">
           <el-button type="warning" plain v-if="GLOBAL.glnub">当前管理员：{{GLOBAL.glnub}}</el-button>
@@ -10,7 +10,7 @@
             <el-button type="success" plain>主页</el-button>
           </router-link>
           <router-link to="/login">
-            <el-button type="info" plain>信息</el-button>
+            <el-button type="info" plain>信息:{{GLOBAL.BWLtime}}</el-button>
           </router-link>
           <el-button type="danger" plain @click="changemag('1')">更换管理员</el-button>
           <el-dialog title="请输入您的管理员账号和密码" :visible.sync="changeGL" width="20%">
@@ -32,18 +32,18 @@
       </div>
       <div class="Left">
         <router-link to="/index">
-          <div>
+          <div class="flowchange">
             <div style="top:32%">主页</div>
           </div>
         </router-link>
         <router-link to="/dangan">
-          <div>
+          <div class="flowchange">
             <div style="top:18%">健康档案</div>
           </div>
         </router-link>
 
         <router-link to="/logoin">
-          <div>
+          <div class="flowchange">
             <div style="top:12%">新用户登记</div>
           </div>
         </router-link>
@@ -115,6 +115,8 @@ export default {
   components: {},
   data() {
     return {
+      //socket
+      socket: "",
       //中转管理员id
       //changeGL更改管理员的模态框
       changeGL: false,
@@ -140,6 +142,20 @@ export default {
       havelogin: false,
     };
   },
+  computed: {
+    BWLtime1() {
+      return this.GLOBAL.BWLtime;
+    },
+  },
+  watch: {
+    havelogin: function () {
+      this.initwebsocket();
+    },
+    BWLtime1: function (ole, nss) {
+      console.log(ole, nss);
+    },
+  },
+
   methods: {
     //修改管理员id
     changemag(key) {
@@ -299,7 +315,6 @@ export default {
       this.$axios({
         url: "http://localhost:3000/resj",
         method: "post",
-        params: {},
       }).then((res) => {
         //存token
         this.GLOBAL.token = res.data.nab;
@@ -313,14 +328,82 @@ export default {
     changedenglu() {
       this.denglu = !this.denglu;
     },
+    //websocket
+    initwebsocket() {
+      if (typeof WebSocket === "undefined") {
+        alert("您的浏览器不支持socket");
+      } else {
+        // 实例化socket
+        this.socket = new WebSocket(
+          this.GLOBAL.websocketSrc +
+            "imserver/" +
+            this.GLOBAL.yanglaoyuanid +
+            "1"
+        );
+        // 监听socket连接
+        this.socket.onopen = () => {
+          this.sendsocket(JSON.stringify({ msg: "萨瓦迪卡" }));
+          console.log("socket连接成功");
+        };
+        // 监听socket错误信息
+        this.socket.onerror = () => {
+          console.log("连接错误" + this.WebSocket.readyState);
+        };
+        // 监听socket消息
+        this.socket.onmessage = (msg) => {
+          let mymsg = JSON.parse(msg.data);
+          // console.log(mymsg);
+          if (mymsg.push_msg != "连接成功") {
+            const h = this.$createElement;
+            this.$message({
+              duration: 5000,
+              message: h("p", { style: "position:relative;width:300px" }, [
+                h("span", { style: "float:left" }, mymsg.push_name),
+                h(
+                  "span",
+                  {
+                    style: "float:right;fontSize:14px",
+                  },
+                  mymsg.push_data
+                ),
+                h(
+                  "div",
+                  {
+                    style:
+                      "width:300px;clear: both;padding-top: 10px;textAlign:left;wordWrap:break-word;",
+                  },
+                  mymsg.push_msg
+                ),
+              ]),
+            });
+          }
+        };
+        console.log(this.socket);
+      }
+    },
+    sendsocket: function (temp) {
+      this.socket.send(temp);
+    },
+
+    // close: function () {
+    //   console.log("socket已经关闭");
+    // },
   },
   mounted() {
     this.getcolor();
   },
+
+  // destroyed() {
+  //   // 销毁监听
+  //   this.socket.onclose = this.close;
+  // },
 };
 </script>
 
 <style lang="scss">
+.flowchange {
+  transition: all 1s;
+}
 #motai {
   height: 100%;
   width: 100%;

@@ -1,4 +1,6 @@
 const serverSrc = 'http://192.168.1.110:8081/';
+const websocketSrc = 'ws://192.168.1.110:8081/';
+// const serverSrc = 'http://192.168.31.48:8081/';
 var mag = ''
 var havelogin = false;
 var dengdai = function (temp) {
@@ -22,7 +24,8 @@ var BL = {
     //需要病人名字 病例id 病人id
     name: '', //病人名字
     sendid: '', //病例id
-    BRid: '', //病人id
+    id: '', //病人id
+    nub: '', //病例是哪一页
 }
 // 个人档案的状态管理
 var GRDA = {
@@ -31,20 +34,23 @@ var GRDA = {
     BLid: '', //病例id
     BRid: '', //病人id
 }
+//全局变量  危险人数
+var bianhua = 0
+//全局变量 首页页面详情的轮训time
+var timer = ''
+//全局变量 首页今日情况的轮训time
+var todaytimer = ''
+//备忘录阅读量
+var BWLtime = 0;
 
 // var Adminid = ''
 // 查看这个全局变量
 // console.log(this.GLOBAL);
-// const token = '12345678';
-// var hasEnter = false;
-// const userSite = "中国钓鱼岛";
-// var register=false;
+
 export default {
-    // userSite,//用户地址
-    // token,//用户token身份
+
     serverSrc, //服务器地址
-    // hasEnter,//用户登录状态
-    // register,
+
     mag,
     //是否登录
     havelogin,
@@ -57,5 +63,11 @@ export default {
     //当前管理员ID
     glnub,
     BL,
-    GRDA
+    GRDA,
+    //websocket地址
+    websocketSrc,
+    bianhua,
+    timer,
+    todaytimer,
+    BWLtime
 }

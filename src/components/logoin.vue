@@ -10,7 +10,12 @@
       <el-form ref="form" :model="form" label-width="120px">
         <div style="width:1000px;float:left">
           <p style="fontSize:20px;marginBottom:20px">用户基本信息登记</p>
-          <el-button icon="el-icon-search" circle style="position: absolute;left: 330px;"></el-button>
+          <el-button
+            icon="el-icon-search"
+            circle
+            style="position: absolute;left: 330px;"
+            @click="cheak(0)"
+          ></el-button>
           <el-form-item label="手机号码">
             <el-input v-model="form.phone" style="width:200px"></el-input>
           </el-form-item>
@@ -28,6 +33,7 @@
             icon="el-icon-search"
             circle
             style="position: absolute;left: 330px;top: 147px;"
+            @click="cheak(1)"
           ></el-button>
 
           <el-form-item label="身份证号">
@@ -129,16 +135,6 @@
           </el-form-item>
         </div>
 
-        <!-- <div>
-          上传头像
-          <input
-            class="file"
-            name="file"
-            type="file"
-            accept="image/png, image/gif, image/jpeg"
-            @change="update($event)"
-          />
-        </div>-->
         <div style="width:1000px;float:left">
           <div style="fontSize:20px;marginBottom:20px;width: 100%;float: left;">健康信息</div>
 
@@ -224,8 +220,22 @@
             <el-input v-model="form.drug_use" style="width:200px" placeholder="非必填"></el-input>
           </el-form-item>
         </div>
-        <div style="width:1000px;left: 1200px;bottom: 45px;position: relative;">
-          <el-form-item style="width:600px;marginLeft:-100px">
+        <div style="float:left;marginTop: 38px;marginLeft: 400px;">
+          <div class="imgput"></div>
+          <div
+            style="position: absolute;backgroundColor:#66b1ff;color:#fff;width:100px;height:50px;lineHeight:50px;borderRadius:10px"
+          >上传头像</div>
+          <input
+            class="file"
+            name="file"
+            type="file"
+            accept="image/png, image/gif, image/jpeg"
+            @change="update($event)"
+            style="width:100px;height:50px;opacity: 0;cursor: pointer;"
+          />
+        </div>
+        <div style="position: relative;left: -800px;top: 400px;">
+          <el-form-item>
             <el-button type="primary" @click="onSubmit()">立即创建</el-button>
             <el-button>清空</el-button>
           </el-form-item>
@@ -275,13 +285,182 @@ export default {
         heart_condition: [],
         family_history: "",
         drug_use: "",
+        image: "",
       },
+      //测试数据
+      datalist: [
+        {
+          id: 0,
+          account_password: "",
+          name: "赵刚",
+          id_number: "5130216640314483X",
+          birthday: "1664:03:14",
+          phone: "13197882903",
+          bed: "",
+          blood_type: "AB",
+          home_location: "",
+          emergency_contact_1_name: "赵晓梦",
+          emergency_contact_1_relationship: "子女",
+          emergency_contact_1_phone: "",
+          emergency_contact_1_location: "",
+          emergency_contact_2_name: "",
+          emergency_contact_2_relationship: "",
+          emergency_contact_2_phone: "",
+          emergency_contact_2_location: "",
+          sex: "男",
+          self_care_ability: "能够自理",
+          level_of_care: "需要护理",
+          responsible_doctor: "",
+          time_start: "",
+          time_second: "",
+          blood_pressure: "高血压",
+          blood_glucose: "无血糖疾病",
+          weight: "64",
+          height: "174",
+          heart_condition: [],
+          family_history: "",
+          drug_use: "",
+          image: "",
+        },
+        {
+          id: 0,
+          account_password: "",
+          name: "陈国强",
+          id_number: "5130216520604483X",
+          birthday: "1652:06:04",
+          phone: "15802833746",
+          bed: "",
+          blood_type: "O",
+          home_location: "",
+          emergency_contact_1_name: "陈刘芳",
+          emergency_contact_1_relationship: "子女",
+          emergency_contact_1_phone: "",
+          emergency_contact_1_location: "",
+          emergency_contact_2_name: "",
+          emergency_contact_2_relationship: "",
+          emergency_contact_2_phone: "",
+          emergency_contact_2_location: "",
+          sex: "男",
+          self_care_ability: "不能自理",
+          level_of_care: "贴身护理",
+          responsible_doctor: "",
+          time_start: "",
+          time_second: "",
+          blood_pressure: "高血压",
+          blood_glucose: "高血糖",
+          weight: "72",
+          height: "164",
+          heart_condition: ["室性早搏", "心室扑动"],
+          family_history: "",
+          drug_use: "",
+          image: "",
+        },
+        {
+          id: 0,
+          account_password: "",
+          name: "王小蝶",
+          id_number: "5130216480914483X",
+          birthday: "1648:09:14",
+          phone: "17709887263",
+          bed: "",
+          blood_type: "A",
+          home_location: "",
+          emergency_contact_1_name: "孟钱",
+          emergency_contact_1_relationship: "子女",
+          emergency_contact_1_phone: "",
+          emergency_contact_1_location: "",
+          emergency_contact_2_name: "",
+          emergency_contact_2_relationship: "",
+          emergency_contact_2_phone: "",
+          emergency_contact_2_location: "",
+          sex: "女",
+          self_care_ability: "不能自理",
+          level_of_care: "贴身护理",
+          responsible_doctor: "",
+          time_start: "",
+          time_second: "",
+          blood_pressure: "高血压",
+          blood_glucose: "高血糖",
+          weight: "45",
+          height: "143",
+          heart_condition: ["室性早搏", "窦性心律不齐"],
+          family_history: "",
+          drug_use: "",
+          image: "",
+        },
+        {
+          id: 0,
+          account_password: "",
+          name: "刘洋",
+          id_number: "5130216690223483X",
+          birthday: "1669:02:23",
+          phone: "15802833746",
+          bed: "",
+          blood_type: "B",
+          home_location: "",
+          emergency_contact_1_name: "张晓燕",
+          emergency_contact_1_relationship: "夫妻",
+          emergency_contact_1_phone: "16882736452",
+          emergency_contact_1_location: "",
+          emergency_contact_2_name: "",
+          emergency_contact_2_relationship: "",
+          emergency_contact_2_phone: "",
+          emergency_contact_2_location: "",
+          sex: "男",
+          self_care_ability: "不能自理",
+          level_of_care: "贴身护理",
+          responsible_doctor: "",
+          time_start: "",
+          time_second: "",
+          blood_pressure: "高血压",
+          blood_glucose: "高血糖",
+          weight: "72",
+          height: "168",
+          heart_condition: ["室性早搏", "房室传导阻滞"],
+          family_history: "",
+          drug_use: "",
+          image: "",
+        },
+      ],
       imageUrl: "",
       dialogVisible1: false,
     };
   },
   methods: {
+    cheak(temp) {
+      this.GLOBAL.dengdai("block");
+      let p = true;
+      if (temp == "0") {
+        for (let i = 0; i < this.datalist.length; i++) {
+          if (this.form.phone == this.datalist[i].phone) {
+            p = false;
+            this.form = JSON.parse(JSON.stringify(this.datalist[i]));
+            this.$message("查询完成");
+          }
+        }
+        if (p) {
+          this.$message.error("无效手机号");
+          this.form = {};
+        }
+      } else {
+        for (let i = 0; i < this.datalist.length; i++) {
+          if (this.form.id_number == this.datalist[i].id_number) {
+            p = false;
+            this.form = JSON.parse(JSON.stringify(this.datalist[i]));
+            this.$message("查询完成");
+          }
+        }
+        if (p) {
+          this.$message.error("无效身份证号");
+          this.form = {};
+        }
+      }
+      setTimeout(() => {
+        this.GLOBAL.dengdai("none");
+      }, 500);
+    },
     onSubmit() {
+      this.GLOBAL.dengdai("block");
       let send = JSON.parse(JSON.stringify(this.form));
       send.time_start = send.time_start.slice(0, 10);
       send.time_second = send.time_second.slice(11, 19);
@@ -300,7 +479,8 @@ export default {
         method: "post",
         data: send,
       }).then((res) => {
-        console.log(res);
+        this.GLOBAL.dengdai("none");
+        console.log(res.data.data);
       });
       // console.log(this.form);
     },
@@ -312,25 +492,41 @@ export default {
         .catch(() => {});
     },
     update(e) {
+      this.GLOBAL.dengdai("block");
       let file = e.target.files[0];
       let param = new FormData(); //创建form对象
-      param.append("userpic", file, file.name); //通过append向form对象添加数据
+      param.append("file", file, file.name); //通过append向form对象添加数据
+      // console.log(param.get("file"));
       //param.append('chunk','0');//添加form表单中其他数据
       //console.log(param.get('tweetPic')); //FormData私有类对象，访问不到，可以通过get判断值是否传进去
       let config = {
         headers: { "Content-Type": "multipart/form-data" },
       }; //添加请求头
-      this.$axios
-        .post(this.GLOBAL.serverSrc + "/UploadImg", param, config)
-        .then((response) => {
-          console.log(response.data);
-        });
+
+      this.$axios({
+        url: this.GLOBAL.serverSrc + "beadhousepeople/loadImage",
+        data: param,
+        config: config,
+        method: "post",
+      }).then((res) => {
+        let img = document.querySelector(".imgput");
+        img.style.backgroundImage = "url(" + res.data.data + ")";
+        console.log("url(" + res.data.data + ")", res.data.data);
+        this.form.image = res.data.data;
+        this.GLOBAL.dengdai("none");
+      });
     },
   },
 };
 </script>
 
 <style>
+.imgput {
+  width: 100px;
+  height: 140px;
+  background-size: 100%;
+  background-repeat: no-repeat;
+}
 .el-checkbox {
   text-align: left;
   width: 148px;

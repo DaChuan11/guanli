@@ -4,39 +4,43 @@
       <!-- 标签 -->
       <el-breadcrumb-item :to="{ path: '/index' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>流程详情</el-breadcrumb-item>
-      <el-breadcrumb-item>{{$route.query.postdataLC.name}}</el-breadcrumb-item>
+      <el-breadcrumb-item>{{GLOBAL.BL.name}}</el-breadcrumb-item>
     </el-breadcrumb>
     <div class="pdfshow">
-      <pdfshow :posturl="$route.query.postdataLC.url"></pdfshow>
+      <pdfshow></pdfshow>
     </div>
     <!-- <button @click="ifch()">000</button> -->
     <div style="float:right;width:950px;height:100%;position: relative;">
-      <el-steps :active="2" align-center direction="vertical">
+      <el-steps
+        :active="$route.query.state==0?4:$route.query.state"
+        align-center
+        direction="vertical"
+      >
         <el-step title="预警发送">
           <template slot="description">
-            <div v-if="progressLiu.step1.timein">发送时间：{{progressLiu.step1.timein}}</div>
-            <p>在--时，老人心率--，电波--，经系统处理，认为老人存在--的风险，属于--风险，将此险情发往--端</p>
+            <div v-if="$route.query.sending_time">发送时间：{{$route.query.sending_time}}</div>
+            <p>{{$route.query.send_details}}</p>
           </template>
         </el-step>
         <el-step title="接收预警">
           <template slot="description">
-            <div v-if="progressLiu.step1.timeout">回应时间：{{progressLiu.step1.timeout}}</div>
-            <p>在--时，--管理端发现了这一预警，在--时及时回应，前往现场进行救治</p>
+            <div
+              v-if="$route.query.receive_early_warning_time"
+            >回应时间：{{$route.query.receive_early_warning_time}}</div>
+            <p>{{$route.query.receive_warning_details}}</p>
           </template>
         </el-step>
         <el-step title="正在处理">
           <template slot="description">
-            <div v-if="progressLiu.step1.timein">到达时间：{{progressLiu.step1.timein}}</div>
-            <p>
-              管理人员：--在--时到达现场，进行了--，--，--等操作，
-              <span>发现病情没有得到缓解，于--时将此病情发送给医生：--</span>
-            </p>
-            <p>医生：--在--时到达现场，进行了--，--，--等操作，问题得到解决,病人的心率稳定在--，电波稳定在--，于--时离开</p>
+            <div v-if="$route.query.handler_time">到达时间：{{$route.query.handler_time}}</div>
+
+            <p>{{$route.query.handler_details}}</p>
           </template>
         </el-step>
         <el-step title="处理完成">
           <template slot="description">
-            <div v-if="progressLiu.step1.timeout">完成时间：{{progressLiu.step1.timeout}}</div>
+            <div v-if="$route.query.completion_time">完成时间：{{$route.query.completion_time}}</div>
+            <p>{{$route.query.completion_details}}</p>
             <p></p>
           </template>
         </el-step>
@@ -46,36 +50,19 @@
 </template>
 
 <script>
-import pdfshow from './pdfshow'
+import pdfshow from "./pdfshow";
 export default {
   name: "liucheng",
   components: {
     pdfshow,
   },
   data() {
-    return {
-      progressLiu: {
-        step1: { timein: "18月10号 12:22:22", timeout: "18月10号 12:23:44" },
-        step2: {
-          timein: "18月10号 12:24:22",
-          timeout: "18月10号 12:24:44",
-          idGL: "章小腿",
-        },
-        step3: {
-          timein: "18月10号 12:26:22",
-          timeout: "18月10号 12:26:44",
-          idGL: "章大腿",
-        },
-        step4: { timein: "18月10号 12:28:22" },
-      },
-      posturl: this.$route.query.postdataLC.url,
-    };
+    return {};
   },
   methods: {
     temp() {
-      console.log(this.$route.query.postdataLC);
+      console.log(this.$route);
     },
-    
   },
 
   mounted() {
